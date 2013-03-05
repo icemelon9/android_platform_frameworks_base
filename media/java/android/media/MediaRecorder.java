@@ -30,6 +30,7 @@ import java.lang.ref.WeakReference;
 
 // begin WITH_TAINT_TRACKING
 import dalvik.system.Taint;
+import dalvik.system.TaintIndexCoder; // add by haichen
 // end WITH_TAINT_TRACKING
 
 /**
@@ -675,7 +676,10 @@ public class MediaRecorder
 // begin WITH_TAINT_TRACKING
         int tag = Taint.TAINT_CLEAR;
         if (getAudioSource() == MediaRecorder.AudioSource.MIC) {
-            tag = Taint.TAINT_MIC;
+			// modified by haichen
+			//tag = Taint.TAINT_MIC;
+			++AudioRecord.sMicCounter;
+            tag = Taint.TAINT_MIC | TaintIndexCoder.encode(AudioRecord.sMicCounter);
         }
 // end WITH_TAINT_TRACKING
 

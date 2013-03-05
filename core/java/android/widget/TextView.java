@@ -133,6 +133,11 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Locale;
 
+// add by haichen
+// begin WITH_TAINT_TRACKING
+import dalvik.system.Taint;
+// end WITH_TAINT_TRACKING
+
 /**
  * Displays text to the user and optionally allows them to edit it.  A TextView
  * is a complete text editor, however the basic class is configured to not
@@ -3414,6 +3419,16 @@ public class TextView extends View implements ViewTreeObserver.OnPreDrawListener
         if (text == null) {
             text = "";
         }
+
+		// add by haichen
+        // begin WITH_TAINT_TRACKING
+		//Log.d("DebugUI", "TextView text[" + text.toString() + "]");
+        if (text instanceof java.lang.String && Taint.getTaintString((String) text) != Taint.TAINT_CLEAR) {
+   	    	int tag = Taint.getTaintString((String) text);
+       		String tsrt = "0x" + Integer.toHexString(tag);
+       		Taint.log("widget.TextView setText with tag " + tsrt + " data[" + text + "]");
+        }
+        // end WITH_TAINT_TRACKING
 
         // If suggestions are not enabled, remove the suggestion spans from the text
         if (!isSuggestionsEnabled()) {

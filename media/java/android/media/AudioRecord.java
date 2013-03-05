@@ -31,6 +31,7 @@ import android.util.Log;
 
 // begin WITH_TAINT_TRACKING
 import dalvik.system.Taint;
+import dalvik.system.TaintIndexCoder; // add by haichen
 // end WITH_TAINT_TRACKING
 
 /**
@@ -94,6 +95,9 @@ public class AudioRecord
     private static final int AUDIORECORD_ERROR_SETUP_INVALIDFORMAT       = -18;
     private static final int AUDIORECORD_ERROR_SETUP_INVALIDSOURCE       = -19;
     private static final int AUDIORECORD_ERROR_SETUP_NATIVEINITFAILED    = -20;
+
+	// add by haichen
+	public static int sMicCounter = 0;
     
     // Events:
     // to keep in sync with frameworks/base/include/media/AudioRecord.h 
@@ -593,9 +597,14 @@ public class AudioRecord
 
 // begin WITH_TAINT_TRACKING
         //return native_read_in_byte_array(audioData, offsetInBytes, sizeInBytes);
-        int tag = Taint.TAINT_MIC;
+
+		// Modified by haichen
+        //int tag = Taint.TAINT_MIC;
+		++sMicCounter;
+		int tag = Taint.TAINT_MIC | TaintIndexCoder.encode(sMicCounter);
         int ret = native_read_in_byte_array(audioData, offsetInBytes, sizeInBytes);
         Taint.addTaintByteArray(audioData, tag);
+		Log.d("DebugMic", "Microphone taint " + sMicCounter + ", tag: 0x" + Integer.toHexString(tag) + "(byte[])");
         return ret;
 // end WITH_TAINT_TRACKING
     }
@@ -623,9 +632,13 @@ public class AudioRecord
 
 // begin WITH_TAINT_TRACKING
         //return native_read_in_short_array(audioData, offsetInShorts, sizeInShorts);
-        int tag = Taint.TAINT_MIC;
+		// Modified by haichen
+        //int tag = Taint.TAINT_MIC;
+		++sMicCounter;
+		int tag = Taint.TAINT_MIC | TaintIndexCoder.encode(sMicCounter);
         int ret = native_read_in_short_array(audioData, offsetInShorts, sizeInShorts);
         Taint.addTaintShortArray(audioData, tag);
+		Log.d("DebugMic", "Microphone taint " + sMicCounter + ", tag: 0x" + Integer.toHexString(tag) + "(short[])");
         return ret;
 // end WITH_TAINT_TRACKING
     }
@@ -652,10 +665,14 @@ public class AudioRecord
 
 // begin WITH_TAINT_TRACKING
         //return native_read_in_direct_buffer(audioBuffer, sizeInBytes);
-        int tag = Taint.TAINT_MIC;
+		// Modified by haichen
+        //int tag = Taint.TAINT_MIC;
+		++sMicCounter;
+		int tag = Taint.TAINT_MIC | TaintIndexCoder.encode(sMicCounter);
         int ret = native_read_in_direct_buffer(audioBuffer, sizeInBytes);
         if (audioBuffer.isDirect()) {
             Taint.addTaintDirectByteBuffer(audioBuffer, tag);
+			Log.d("DebugMic", "Microphone taint " + sMicCounter + ", tag: 0x" + Integer.toHexString(tag) + "(ByteBuffer)");
         }
         return ret;
 // end WITH_TAINT_TRACKING  

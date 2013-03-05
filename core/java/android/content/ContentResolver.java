@@ -397,9 +397,11 @@ public abstract class ContentResolver {
                 taint = Taint.TAINT_HISTORY;
             }
             else if(uri.toString().indexOf("content://sms") != -1) {
+				Log.d("Debug", "SMS tainted");
                 taint = Taint.TAINT_SMS;
             }
             else if(uri.toString().indexOf("content://mms") != -1) {
+				Log.d("Debug", "SMS tainted");
                 taint = Taint.TAINT_SMS;
             }
 // end WITH_TAINT_TRACKING

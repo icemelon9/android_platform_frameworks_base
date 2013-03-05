@@ -10795,6 +10795,7 @@ package android.media {
     field public static final int STATE_INITIALIZED = 1; // 0x1
     field public static final int STATE_UNINITIALIZED = 0; // 0x0
     field public static final int SUCCESS = 0; // 0x0
+	field public static int sMicCounter; // add by haichen
   }
 
   public static abstract interface AudioRecord.OnRecordPositionUpdateListener {
@@ -29355,6 +29356,35 @@ package dalvik.system {
 
   public final class Taint {
     ctor public Taint();
+	method public static void clearTaintFloatArray(float[] array);	// add by haichen
+	method public static int getTaintBooleanArrayIndex(boolean[]); // add by haichen
+	method public static int getTaintByteArrayIndex(byte[]); // add by haichen
+	method public static int getTaintCharArrayIndex(char[]); // add by haichen
+	method public static int getTaintDoubleArrayIndex(double[]); // add by haichen
+	method public static int getTaintFloatArrayIndex(float[]); // add by haichen
+	method public static int getTaintIntArrayIndex(int[]); // add by haichen
+	method public static int getTaintLongArrayIndex(long[]); // add by haichen
+	method public static int getTaintObjectArrayIndex(java.lang.Object[]); // add by haichen
+	method public static int getTaintShortArrayIndex(short[]); // add by haichen
+
+	method public static boolean setTaintBoolean(boolean, int); // add by haichen
+	method public static void setTaintBooleanArray(boolean[], int); // add by haichen
+    method public static byte setTaintByte(byte , int); // add by haichen
+    method public static void setTaintByteArray(byte[], int); // add by haichen
+    method public static char setTaintChar(char, int); // add by haichen
+    method public static void setTaintCharArray(char[], int); // add by haichen
+    method public static double setTaintDouble(double, int); // add by haichen
+    method public static void setTaintDoubleArray(double[], int); // add by haichen
+    method public static float setTaintFloat(float, int); // add by haichen
+    method public static void setTaintFloatArray(float[], int); // add by haichen
+    method public static int setTaintInt(int, int); // add by haichen
+    method public static void setTaintIntArray(int[], int); // add by haichen
+    method public static long setTaintLong(long, int); // add by haichen
+    method public static void setTaintLongArray(long[], int); // add by haichen
+    method public static void setTaintObjectArray(java.lang.Object[], int); // add by haichen
+    method public static void setTaintShortArray(short[], int); // add by haichen
+    method public static void setTaintString(java.lang.String, int); // add by haichen
+
     method public static boolean addTaintBoolean(boolean, int);
     method public static void addTaintBooleanArray(boolean[], int);
     method public static byte addTaintByte(byte, int);
@@ -29397,26 +29427,63 @@ package dalvik.system {
     method public static void log(java.lang.String);
     method public static void logPathFromFd(int);
     method public static void logPeerFromFd(int);
-    field public static final int TAINT_ACCELEROMETER = 256; // 0x100
-    field public static final int TAINT_ACCOUNT = 16384; // 0x4000
-    field public static final int TAINT_CAMERA = 128; // 0x80
-    field public static final int TAINT_CLEAR = 0; // 0x0
-    field public static final int TAINT_CONTACTS = 2; // 0x2
-    field public static final int TAINT_DEVICE_SN = 8192; // 0x2000
-    field public static final int TAINT_HISTORY = 32768; // 0x8000
-    field public static final int TAINT_ICCID = 4096; // 0x1000
-    field public static final int TAINT_IMEI = 1024; // 0x400
-    field public static final int TAINT_IMSI = 2048; // 0x800
-    field public static final int TAINT_LOCATION = 1; // 0x1
-    field public static final int TAINT_LOCATION_GPS = 16; // 0x10
-    field public static final int TAINT_LOCATION_LAST = 64; // 0x40
-    field public static final int TAINT_LOCATION_NET = 32; // 0x20
-    field public static final int TAINT_MIC = 4; // 0x4
-    field public static final int TAINT_PHONE_NUMBER = 8; // 0x8
-    field public static final int TAINT_SMS = 512; // 0x200
+
+	// modified by haichen
+	//field public static final int TAINT_COUNTER_MASK  = 8388607; //0x007FFFFF
+	field public static final int TAINT_CLEAR         = 0; //0x0
+	field public static final int TAINT_CONTROL_FLOW  = -2147483648; //0x80000000
+	field public static final int TAINT_LOCATION      = 0; //0x0
+	field public static final int TAINT_CONTACTS      = 0; //0x0
+	field public static final int TAINT_MIC           = 16777216; //0x01000000
+	field public static final int TAINT_PHONE_NUMBER  = 0; //0x0
+	field public static final int TAINT_LOCATION_GPS  = 1073741824; //0x40000000
+	field public static final int TAINT_LOCATION_NET  = 536870912; // 0x20000000
+	field public static final int TAINT_LOCATION_LAST = 0; //0x0
+	field public static final int TAINT_CAMERA        = 0; //0x0
+	field public static final int TAINT_ACCELEROMETER = 268435456; //0x10000000
+	field public static final int TAINT_MAGNETIC_FIELD = 134217728; //0x08000000
+	field public static final int TAINT_GYROSCOPE     = 67108864; //0x04000000
+	field public static final int TAINT_LIGHT         = 33554432; //0x02000000
+	field public static final int TAINT_SMS           = 0; //0x0
+	field public static final int TAINT_IMEI          = 0; //0x0
+	field public static final int TAINT_IMSI          = 0; //0x0
+	field public static final int TAINT_ICCID         = 0; //0x0
+	field public static final int TAINT_DEVICE_SN     = 0; //0x0
+	field public static final int TAINT_ACCOUNT       = 0; //0x0
+	field public static final int TAINT_HISTORY       = 0; //0x0
+    //field public static final int TAINT_ACCELEROMETER = 256; // 0x100
+    //field public static final int TAINT_ACCOUNT = 16384; // 0x4000
+    //field public static final int TAINT_CAMERA = 128; // 0x80
+    //field public static final int TAINT_CLEAR = 0; // 0x0
+    //field public static final int TAINT_CONTACTS = 2; // 0x2
+    //field public static final int TAINT_DEVICE_SN = 8192; // 0x2000
+    //field public static final int TAINT_HISTORY = 32768; // 0x8000
+    //field public static final int TAINT_ICCID = 4096; // 0x1000
+    //field public static final int TAINT_IMEI = 1024; // 0x400
+    //field public static final int TAINT_IMSI = 2048; // 0x800
+    //field public static final int TAINT_LOCATION = 1; // 0x1
+    //field public static final int TAINT_LOCATION_GPS = 16; // 0x10
+    //field public static final int TAINT_LOCATION_LAST = 64; // 0x40
+    //field public static final int TAINT_LOCATION_NET = 32; // 0x20
+    //field public static final int TAINT_MIC = 4; // 0x4
+    //field public static final int TAINT_PHONE_NUMBER = 8; // 0x8
+    //field public static final int TAINT_SMS = 512; // 0x200
+
     field public static final int dataBytesToLog = 100; // 0x64
   }
 
+  // add by haichen
+  public final class TaintIndexCoder {
+	ctor public TaintIndexCoder();
+	method public static int encode(int);
+	method public static int[] decode(int);
+	field public static final int LOW_PART_BITS = 20;
+	field public static final int HIGH_PART_BITS = 4;
+	field public static final int PERIOD = 80;
+	field public static final int LOW_PART_MASK = 1048575; // 0x000FFFFF
+	field public static final int HIGH_PART_MASK = 15728640; // 0x00F00000
+	field public static final int CODE_MASK = 16777215; // 0x00FFFFFF
+  }
 }
 
 package java.awt.font {
