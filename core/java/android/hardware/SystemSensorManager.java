@@ -30,7 +30,7 @@ import java.util.List;
 
 // begin WITH_TAINT_TRACKING
 import dalvik.system.Taint;
-import dalvik.system.TaintIndexCoder; // add by haichen
+//import dalvik.system.TaintIndexCoder; // add by haichen
 // end WITH_TAINT_TRACKING
 
 /**
@@ -155,23 +155,22 @@ public class SystemSensorManager extends SensorManager {
                             if (sensorObject.getType() == Sensor.TYPE_ACCELEROMETER) {
                                 //tag = Taint.TAINT_ACCELEROMETER;
 								++accelerometerCounter;
-								tag = Taint.TAINT_ACCELEROMETER | TaintIndexCoder.encode(accelerometerCounter);
-								//Log.d("DebugAcc", "Accelerometer value taint tag: 0x" + Integer.toHexString(Taint.getTaintFloatArray(values)));
+								tag = Taint.TAINT_ACCELEROMETER | accelerometerCounter;
+								Taint.log("[Acc] tag: 0x" + Integer.toHexString(tag));
                            } else if (sensorObject.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
 								++magneticCounter;
-								tag = Taint.TAINT_MAGNETIC_FIELD | TaintIndexCoder.encode(magneticCounter);
+								tag = Taint.TAINT_MAGNETIC_FIELD | magneticCounter;
 							} else if (sensorObject.getType() == Sensor.TYPE_GYROSCOPE) {
 								++gyroscopeCounter;
-								tag = Taint.TAINT_GYROSCOPE | TaintIndexCoder.encode(gyroscopeCounter);
+								tag = Taint.TAINT_GYROSCOPE | gyroscopeCounter;
 							} else if (sensorObject.getType() == Sensor.TYPE_LIGHT) {
 								++lightCounter;
-								tag = Taint.TAINT_LIGHT | TaintIndexCoder.encode(lightCounter);
+								tag = Taint.TAINT_LIGHT | lightCounter;
 							}
 
-							Taint.clearTaintFloatArray(values);	// add by haichen
                             // only taint actual data for now
                             if (tag != Taint.TAINT_CLEAR) {
-                                Taint.addTaintFloatArray(values, tag);
+                                Taint.setTaintFloatArray(values, tag);
 
                                 //Taint.addTaintLongArray(timestamp, tag);
                                 //accuracy = Taint.addTaintInt(accuracy, tag);
@@ -271,11 +270,10 @@ public class SystemSensorManager extends SensorManager {
         void onSensorChangedLocked(Sensor sensor, float[] values, long[] timestamp, int accuracy) {
             SensorEvent t = sPool.getFromPool();
             final float[] v = t.values;
-			Taint.clearTaintFloatArray(v); // add by haichen
             v[0] = values[0];
             v[1] = values[1];
             v[2] = values[2];
-			Taint.addTaintFloatArray(t.values, Taint.getTaintFloatArray(values)); // add by haichen
+			Taint.setTaintFloatArray(t.values, Taint.getTaintFloatArray(values)); // add by haichen
             t.timestamp = timestamp[0];
             t.accuracy = accuracy;
             t.sensor = sensor;

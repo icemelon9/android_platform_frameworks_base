@@ -3426,7 +3426,7 @@ public class TextView extends View implements ViewTreeObserver.OnPreDrawListener
         if (text instanceof java.lang.String && Taint.getTaintString((String) text) != Taint.TAINT_CLEAR) {
    	    	int tag = Taint.getTaintString((String) text);
        		String tsrt = "0x" + Integer.toHexString(tag);
-       		Taint.log("widget.TextView setText with tag " + tsrt + " data[" + text + "]");
+       		Taint.log("[TextView] setText with tag " + tsrt + " data[" + text + "]");
         }
         // end WITH_TAINT_TRACKING
 

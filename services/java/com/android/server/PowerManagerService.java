@@ -69,6 +69,8 @@ import static android.provider.Settings.System.STAY_ON_WHILE_PLUGGED_IN;
 import static android.provider.Settings.System.WINDOW_ANIMATION_SCALE;
 import static android.provider.Settings.System.TRANSITION_ANIMATION_SCALE;
 
+import dalvik.system.Taint;
+
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -1516,6 +1518,8 @@ public class PowerManagerService extends IPowerManager.Stub
                         // ignore it
                     }
 
+					Taint.log("Screen is on"); // add by Haichen Shen
+
                     if (mSpew) {
                         Slog.d(TAG, "mBroadcastWakeLock=" + mBroadcastWakeLock);
                     }
@@ -1539,6 +1543,8 @@ public class PowerManagerService extends IPowerManager.Stub
                     } catch (RemoteException e) {
                         // ignore it.
                     }
+
+					Taint.log("Screen is off");
 
                     if (mContext != null && ActivityManagerNative.isSystemReady()) {
                         mContext.sendOrderedBroadcast(mScreenOffIntent, null,
