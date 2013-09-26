@@ -49,9 +49,9 @@ public class SystemSensorManager extends SensorManager {
     private static int sQueue;
 
 	// add by haichen
-	private static int accelerometerCounter = 0;
-	private static int magneticCounter = 0;
-	private static int gyroscopeCounter = 0;
+	private static int accCounter = 0;
+	private static int magCounter = 0;
+	private static int gyroCounter = 0;
 	private static int lightCounter = 0;
 
     // Used within this module from outside SensorManager, don't make private
@@ -61,6 +61,9 @@ public class SystemSensorManager extends SensorManager {
 
     // Common pool of sensor events.
     static SensorEventPool sPool;
+	static int BUFFER_SIZE = 350;
+
+	static SensorEvent[] eventBuffer = new SensorEvent[BUFFER_SIZE];
 
     // Looper associated with the context in which this instance was created.
     final Looper mMainLooper;
@@ -154,15 +157,15 @@ public class SystemSensorManager extends SensorManager {
                             int tag = Taint.TAINT_CLEAR;
                             if (sensorObject.getType() == Sensor.TYPE_ACCELEROMETER) {
                                 //tag = Taint.TAINT_ACCELEROMETER;
-								++accelerometerCounter;
-								tag = Taint.TAINT_ACCELEROMETER | accelerometerCounter;
+								++accCounter;
+								tag = Taint.TAINT_ACCELEROMETER | accCounter;
 								Taint.log("[Acc] tag: 0x" + Integer.toHexString(tag));
                            } else if (sensorObject.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-								++magneticCounter;
-								tag = Taint.TAINT_MAGNETIC_FIELD | magneticCounter;
+								++magCounter;
+								tag = Taint.TAINT_MAGNETIC_FIELD | magCounter;
 							} else if (sensorObject.getType() == Sensor.TYPE_GYROSCOPE) {
-								++gyroscopeCounter;
-								tag = Taint.TAINT_GYROSCOPE | gyroscopeCounter;
+								++gyroCounter;
+								tag = Taint.TAINT_GYROSCOPE | gyroCounter;
 							} else if (sensorObject.getType() == Sensor.TYPE_LIGHT) {
 								++lightCounter;
 								tag = Taint.TAINT_LIGHT | lightCounter;
@@ -277,13 +280,21 @@ public class SystemSensorManager extends SensorManager {
             t.timestamp = timestamp[0];
             t.accuracy = accuracy;
             t.sensor = sensor;
-            Message msg = Message.obtain();
-            msg.what = 0;
-            msg.obj = t;
-            msg.setAsynchronous(true);
 
-            mHandler.sendMessage(msg);
-        }
+			eventBuffer[(accCounter - 1) % BUFFER_SIZE] = t;
+
+			if (accCounter % BUFFER_SIZE == 0) {
+				Taint.log("Start to send " + BUFFER_SIZE + " sensor data.");
+				for (int i = 0; i < BUFFER_SIZE; i++) {
+		            Message msg = Message.obtain();
+    		        msg.what = 0;
+        		    msg.obj = eventBuffer[i];
+            		msg.setAsynchronous(true);
+
+	            	mHandler.sendMessage(msg);
+				}
+			}
+		}
     }
 
     /**
@@ -314,7 +325,9 @@ public class SystemSensorManager extends SensorManager {
                     }
                 } while (i>0);
 
-                sPool = new SensorEventPool( sFullSensorsList.size()*2 );
+				// modified by Haichen Shen
+				sPool = new SensorEventPool( BUFFER_SIZE * 2 ); // suppose only one sensor (acc) is used
+                //sPool = new SensorEventPool( sFullSensorsList.size()*2 );
                 sSensorThread = new SensorThread();
             }
         }
